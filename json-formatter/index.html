@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter & Parser Online - Free JSON Beautifier</title>
+  <meta name="description" content="Free online JSON formatter, validator, and parser. Beautify, minify, and validate JSON data instantly in your browser. No data sent to servers.">
+  <meta name="keywords" content="json formatter, json parser, json beautifier, json validator, json minify, online json tool">
+  <link rel="canonical" href="https://no0001.github.io/hello-world/json-formatter/">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="logo">🛠 DevToolBox</a>
+    <div class="nav-links">
+      <a href="/json-formatter/" style="color:var(--text)">JSON Formatter</a>
+    </div>
+  </nav>
+
+  <main class="tool-page">
+    <div class="tool-header">
+      <h1>JSON Formatter / Parser</h1>
+      <p>Paste your JSON — format, validate, minify, or parse it instantly.</p>
+    </div>
+
+    <!-- Ad Slot: Top Banner -->
+    <div class="ad-slot" id="ad-top">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="formatJSON()">✨ Format</button>
+      <button onclick="minifyJSON()">📦 Minify</button>
+      <button onclick="validateJSON()">✅ Validate</button>
+      <button onclick="copyOutput()">📋 Copy</button>
+      <button onclick="clearAll()">🗑 Clear</button>
+      <select id="indentSize" onchange="formatJSON()">
+        <option value="2">2 spaces</option>
+        <option value="4">4 spaces</option>
+        <option value="tab">Tab</option>
+      </select>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Input (Raw JSON)</span>
+          <span class="status empty" id="statusBadge">Empty</span>
+        </div>
+        <textarea
+          class="editor"
+          id="jsonInput"
+          placeholder='Paste your JSON here...&#10;&#10;Example:&#10;{"name":"DevToolBox","version":1,"features":["format","validate","minify"]}'
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Output (Formatted)</span>
+        </div>
+        <pre class="output" id="jsonOutput"></pre>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <span id="statChars">Characters: 0</span>
+      <span id="statLines">Lines: 0</span>
+      <span id="statSize">Size: 0 B</span>
+      <span id="statKeys">Keys: —</span>
+    </div>
+
+    <!-- Ad Slot: Below Tool -->
+    <div class="ad-slot" id="ad-bottom">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <!-- SEO Content -->
+    <section class="seo-content">
+      <h2>What is JSON?</h2>
+      <p>JSON (JavaScript Object Notation) is a lightweight data interchange format that is easy for humans to read and write, and easy for machines to parse and generate. It is widely used in web APIs, configuration files, and data storage.</p>
+
+      <h2>What does this tool do?</h2>
+      <ul>
+        <li><strong>Format / Beautify</strong> — Adds proper indentation and line breaks to make JSON readable.</li>
+        <li><strong>Minify</strong> — Removes all whitespace to reduce file size for production use.</li>
+        <li><strong>Validate</strong> — Checks if your JSON is syntactically correct and shows detailed error messages.</li>
+        <li><strong>Parse</strong> — Converts JSON text into a structured, browsable format.</li>
+      </ul>
+
+      <h2>Is my data safe?</h2>
+      <p>Yes. Everything runs locally in your browser using <code>JSON.parse()</code> and <code>JSON.stringify()</code>. No data is ever sent to any server.</p>
+
+      <h2>JSON.parse() Syntax</h2>
+      <p>In JavaScript, you can parse JSON with:</p>
+      <p><code>const obj = JSON.parse('{"key": "value"}');</code></p>
+      <p>If the JSON is invalid, a <code>SyntaxError</code> will be thrown.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 DevToolBox. All tools run locally in your browser. No data is sent to any server.</p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('jsonInput');
+    const output = document.getElementById('jsonOutput');
+    const badge = document.getElementById('statusBadge');
+
+    // Auto-format on paste
+    input.addEventListener('input', () => {
+      updateStats();
+      if (input.value.trim()) {
+        formatJSON();
+      } else {
+        output.textContent = '';
+        setBadge('empty', 'Empty');
+      }
+    });
+
+    function getIndent() {
+      const v = document.getElementById('indentSize').value;
+      return v === 'tab' ? '\t' : Number(v);
+    }
+
+    function formatJSON() {
+      const raw = input.value.trim();
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+      try {
+        const parsed = JSON.parse(raw);
+        output.textContent = JSON.stringify(parsed, null, getIndent());
+        setBadge('valid', '✓ Valid');
+      } catch (e) {
+        output.innerHTML = '<span class="error-msg">❌ ' + escapeHtml(e.message) + '</span>';
+        setBadge('invalid', '✗ Invalid');
+      }
+      updateStats();
+    }
+
+    function minifyJSON() {
+      const raw = input.value.trim();
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        const minified = JSON.stringify(parsed);
+        output.textContent = minified;
+        setBadge('valid', '✓ Valid');
+      } catch (e) {
+        output.innerHTML = '<span class="error-msg">❌ ' + escapeHtml(e.message) + '</span>';
+        setBadge('invalid', '✗ Invalid');
+      }
+    }
+
+    function validateJSON() {
+      const raw = input.value.trim();
+      if (!raw) { alert('Paste some JSON first!'); return; }
+      try {
+        JSON.parse(raw);
+        const msg = '✅ Valid JSON';
+        output.textContent = msg;
+        setBadge('valid', '✓ Valid');
+      } catch (e) {
+        const position = extractPosition(e.message);
+        let msg = '❌ Invalid JSON\n\n';
+        msg += 'Error: ' + e.message + '\n';
+        if (position !== null) {
+          msg += 'Position: character ' + position + '\n';
+          msg += 'Near: "...' + raw.substring(Math.max(0, position - 20), position + 20) + '..."';
+        }
+        output.innerHTML = '<span class="error-msg">' + escapeHtml(msg) + '</span>';
+        setBadge('invalid', '✗ Invalid');
+      }
+    }
+
+    function copyOutput() {
+      const text = output.textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      });
+    }
+
+    function clearAll() {
+      input.value = '';
+      output.textContent = '';
+      setBadge('empty', 'Empty');
+      updateStats();
+    }
+
+    function setBadge(cls, text) {
+      badge.className = 'status ' + cls;
+      badge.textContent = text;
+    }
+
+    function updateStats() {
+      const raw = input.value;
+      document.getElementById('statChars').textContent = 'Characters: ' + raw.length;
+      document.getElementById('statLines').textContent = 'Lines: ' + (raw ? raw.split('\n').length : 0);
+      const bytes = new Blob([raw]).size;
+      document.getElementById('statSize').textContent = 'Size: ' + formatBytes(bytes);
+      try {
+        const parsed = JSON.parse(raw);
+        const keys = countKeys(parsed);
+        document.getElementById('statKeys').textContent = 'Keys: ' + keys;
+      } catch {
+        document.getElementById('statKeys').textContent = 'Keys: —';
+      }
+    }
+
+    function countKeys(obj) {
+      if (typeof obj !== 'object' || obj === null) return 0;
+      if (Array.isArray(obj)) return obj.reduce((a, v) => a + countKeys(v), 0);
+      return Object.keys(obj).reduce((a, k) => a + 1 + countKeys(obj[k]), 0);
+    }
+
+    function formatBytes(b) {
+      if (b === 0) return '0 B';
+      const units = ['B', 'KB', 'MB'];
+      const i = Math.floor(Math.log(b) / Math.log(1024));
+      return (b / Math.pow(1024, i)).toFixed(i ? 1 : 0) + ' ' + units[i];
+    }
+
+    function extractPosition(msg) {
+      const m = msg.match(/position\s+(\d+)/i);
+      return m ? parseInt(m[1]) : null;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  </script>
+</body>
+</html>
