@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Encoder & Decoder Online - Free URL Encoding Tool</title>
+  <meta name="description" content="Free online URL encoder and decoder. Encode special characters for URLs or decode percent-encoded strings instantly in your browser.">
+  <meta name="keywords" content="url encoder, url decoder, percent encoding, urlencode, urldecode, online url tool">
+  <link rel="canonical" href="https://no0001.github.io/hello-world/url-encoder/">
+  <link rel="stylesheet" href="/hello-world/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/hello-world/" class="logo">🛠 DevToolBox</a>
+    <div class="nav-links">
+      <a href="/hello-world/json-formatter/">JSON Formatter</a>
+      <a href="/hello-world/base64/">Base64</a>
+      <a href="/hello-world/url-encoder/" style="color:var(--text)">URL Encoder</a>
+      <a href="/hello-world/timestamp/">Timestamp</a>
+      <a href="/hello-world/hash-generator/">Hash Generator</a>
+    </div>
+  </nav>
+
+  <main class="tool-page">
+    <div class="tool-header">
+      <h1>URL Encoder / Decoder</h1>
+      <p>Encode special characters for URLs or decode percent-encoded strings.</p>
+    </div>
+
+    <!-- Ad Slot: Top Banner -->
+    <div class="ad-slot" id="ad-top">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="encodeURL()">🔒 Encode</button>
+      <button onclick="decodeURL()">🔓 Decode</button>
+      <button onclick="encodeComponent()">🔒 encodeURIComponent</button>
+      <button onclick="copyOutput()">📋 Copy</button>
+      <button onclick="clearAll()">🗑 Clear</button>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Input</span>
+          <span class="status empty" id="statusBadge">Empty</span>
+        </div>
+        <textarea
+          class="editor"
+          id="textInput"
+          placeholder="Enter text to URL-encode, or paste an encoded URL to decode...&#10;&#10;Example:&#10;https://example.com/search?q=hello world&lang=中文"
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Output</span>
+        </div>
+        <pre class="output" id="textOutput"></pre>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <span id="statChars">Input: 0 chars</span>
+      <span id="statOutputChars">Output: 0 chars</span>
+      <span id="statSize">Size: 0 B</span>
+    </div>
+
+    <!-- Ad Slot: Below Tool -->
+    <div class="ad-slot" id="ad-bottom">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <!-- SEO Content -->
+    <section class="seo-content">
+      <h2>What is URL Encoding?</h2>
+      <p>URL encoding (also known as percent-encoding) is a method of encoding special characters in a URL by replacing them with a <code>%</code> sign followed by two hexadecimal digits. For example, a space becomes <code>%20</code> and <code>&amp;</code> becomes <code>%26</code>.</p>
+
+      <h2>Why is URL encoding needed?</h2>
+      <p>URLs can only contain a limited set of ASCII characters. Characters like spaces, Unicode characters, and special symbols (<code>&amp;</code>, <code>=</code>, <code>?</code>, <code>#</code>) have special meaning in URLs. Encoding ensures they are transmitted correctly without breaking the URL structure.</p>
+
+      <h2>encodeURI vs encodeURIComponent</h2>
+      <ul>
+        <li><strong>encodeURI()</strong> — Encodes a complete URI. It does NOT encode characters that have special meaning in a URI: <code>: / ? # [ ] @ ! $ & ' ( ) * + , ; =</code></li>
+        <li><strong>encodeURIComponent()</strong> — Encodes a URI component (like a query parameter value). It encodes ALL special characters including <code>/ ? : @ & = + $ #</code></li>
+      </ul>
+      <p>Use <code>encodeURI()</code> for full URLs and <code>encodeURIComponent()</code> for individual parameter values.</p>
+
+      <h2>Is my data safe?</h2>
+      <p>Yes. Everything runs locally in your browser using JavaScript's built-in <code>encodeURI()</code>, <code>encodeURIComponent()</code>, and <code>decodeURIComponent()</code> functions. No data is ever sent to any server.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 DevToolBox. All tools run locally in your browser. <a href="/hello-world/privacy/" style="color:var(--text-muted)">Privacy Policy</a></p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('textInput');
+    const output = document.getElementById('textOutput');
+    const badge = document.getElementById('statusBadge');
+
+    input.addEventListener('input', updateStats);
+
+    function encodeURL() {
+      const raw = input.value;
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+      try {
+        output.textContent = encodeURI(raw);
+        setBadge('valid', '✓ Encoded');
+      } catch (e) {
+        output.innerHTML = '<span class="error-msg">❌ ' + escapeHtml(e.message) + '</span>';
+        setBadge('invalid', '✗ Error');
+      }
+      updateStats();
+    }
+
+    function encodeComponent() {
+      const raw = input.value;
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+      try {
+        output.textContent = encodeURIComponent(raw);
+        setBadge('valid', '✓ Encoded');
+      } catch (e) {
+        output.innerHTML = '<span class="error-msg">❌ ' + escapeHtml(e.message) + '</span>';
+        setBadge('invalid', '✗ Error');
+      }
+      updateStats();
+    }
+
+    function decodeURL() {
+      const raw = input.value.trim();
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+      try {
+        output.textContent = decodeURIComponent(raw);
+        setBadge('valid', '✓ Decoded');
+      } catch (e) {
+        output.innerHTML = '<span class="error-msg">❌ Invalid encoded string: ' + escapeHtml(e.message) + '</span>';
+        setBadge('invalid', '✗ Error');
+      }
+      updateStats();
+    }
+
+    function copyOutput() {
+      const text = output.textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      });
+    }
+
+    function clearAll() {
+      input.value = '';
+      output.textContent = '';
+      setBadge('empty', 'Empty');
+      updateStats();
+    }
+
+    function setBadge(cls, text) {
+      badge.className = 'status ' + cls;
+      badge.textContent = text;
+    }
+
+    function updateStats() {
+      const raw = input.value;
+      const out = output.textContent || '';
+      document.getElementById('statChars').textContent = 'Input: ' + raw.length + ' chars';
+      document.getElementById('statOutputChars').textContent = 'Output: ' + out.length + ' chars';
+      const bytes = new Blob([raw]).size;
+      document.getElementById('statSize').textContent = 'Size: ' + formatBytes(bytes);
+    }
+
+    function formatBytes(b) {
+      if (b === 0) return '0 B';
+      const units = ['B', 'KB', 'MB'];
+      const i = Math.floor(Math.log(b) / Math.log(1024));
+      return (b / Math.pow(1024, i)).toFixed(i ? 1 : 0) + ' ' + units[i];
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  </script>
+</body>
+</html>

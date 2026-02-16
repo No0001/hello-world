@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unix Timestamp Converter Online - Epoch Time Converter</title>
+  <meta name="description" content="Free online Unix timestamp converter. Convert timestamps to human-readable dates and dates to Unix timestamps. Supports seconds and milliseconds.">
+  <meta name="keywords" content="unix timestamp, epoch converter, timestamp to date, date to timestamp, unix time, epoch time">
+  <link rel="canonical" href="https://no0001.github.io/hello-world/timestamp/">
+  <link rel="stylesheet" href="/hello-world/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/hello-world/" class="logo">🛠 DevToolBox</a>
+    <div class="nav-links">
+      <a href="/hello-world/json-formatter/">JSON Formatter</a>
+      <a href="/hello-world/base64/">Base64</a>
+      <a href="/hello-world/url-encoder/">URL Encoder</a>
+      <a href="/hello-world/timestamp/" style="color:var(--text)">Timestamp</a>
+      <a href="/hello-world/hash-generator/">Hash Generator</a>
+    </div>
+  </nav>
+
+  <main class="tool-page">
+    <div class="tool-header">
+      <h1>Unix Timestamp Converter</h1>
+      <p>Convert between Unix timestamps and human-readable dates.</p>
+    </div>
+
+    <!-- Ad Slot: Top Banner -->
+    <div class="ad-slot" id="ad-top">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="timestampToDate()">⏱→📅 Timestamp to Date</button>
+      <button onclick="dateToTimestamp()">📅→⏱ Date to Timestamp</button>
+      <button onclick="showNow()">🕐 Now</button>
+      <button onclick="copyOutput()">📋 Copy</button>
+      <button onclick="clearAll()">🗑 Clear</button>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Input (Timestamp or Date)</span>
+          <span class="status empty" id="statusBadge">Empty</span>
+        </div>
+        <textarea
+          class="editor"
+          id="textInput"
+          placeholder="Enter a Unix timestamp or a date string...&#10;&#10;Examples:&#10;1700000000&#10;1700000000000&#10;2024-01-15T10:30:00Z&#10;2024-01-15 10:30:00&#10;Jan 15, 2024"
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Output</span>
+        </div>
+        <pre class="output" id="textOutput"></pre>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <span id="statNow">Current Timestamp: —</span>
+      <span id="statNowDate">—</span>
+    </div>
+
+    <!-- Ad Slot: Below Tool -->
+    <div class="ad-slot" id="ad-bottom">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <!-- SEO Content -->
+    <section class="seo-content">
+      <h2>What is a Unix Timestamp?</h2>
+      <p>A Unix timestamp (also known as Epoch time or POSIX time) is the number of seconds that have elapsed since January 1, 1970, 00:00:00 UTC (the Unix Epoch). It is a widely used standard for tracking time in computing systems.</p>
+
+      <h2>Seconds vs Milliseconds</h2>
+      <p>Unix timestamps are traditionally measured in <strong>seconds</strong> (10 digits, e.g., <code>1700000000</code>). However, many programming languages and APIs use <strong>milliseconds</strong> (13 digits, e.g., <code>1700000000000</code>). This tool auto-detects the format based on the number of digits.</p>
+
+      <h2>How to get the current timestamp</h2>
+      <ul>
+        <li><strong>JavaScript:</strong> <code>Math.floor(Date.now() / 1000)</code></li>
+        <li><strong>Python:</strong> <code>import time; int(time.time())</code></li>
+        <li><strong>Bash:</strong> <code>date +%s</code></li>
+        <li><strong>PHP:</strong> <code>time()</code></li>
+      </ul>
+
+      <h2>Is my data safe?</h2>
+      <p>Yes. All conversions happen locally in your browser using JavaScript's <code>Date</code> object. No data is sent to any server.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 DevToolBox. All tools run locally in your browser. <a href="/hello-world/privacy/" style="color:var(--text-muted)">Privacy Policy</a></p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('textInput');
+    const output = document.getElementById('textOutput');
+    const badge = document.getElementById('statusBadge');
+
+    // Live clock
+    function updateClock() {
+      const now = new Date();
+      const ts = Math.floor(now.getTime() / 1000);
+      document.getElementById('statNow').textContent = 'Current Timestamp: ' + ts;
+      document.getElementById('statNowDate').textContent = now.toISOString();
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    function timestampToDate() {
+      const raw = input.value.trim();
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+
+      let ts = Number(raw);
+      if (isNaN(ts)) {
+        output.innerHTML = '<span class="error-msg">❌ Not a valid number</span>';
+        setBadge('invalid', '✗ Error');
+        return;
+      }
+
+      // Auto-detect seconds vs milliseconds
+      let ms, unit;
+      if (raw.length >= 13) {
+        ms = ts;
+        unit = 'milliseconds';
+      } else {
+        ms = ts * 1000;
+        unit = 'seconds';
+      }
+
+      const date = new Date(ms);
+      if (isNaN(date.getTime())) {
+        output.innerHTML = '<span class="error-msg">❌ Invalid timestamp</span>';
+        setBadge('invalid', '✗ Error');
+        return;
+      }
+
+      let result = '';
+      result += 'Detected: ' + unit + '\n\n';
+      result += '── UTC ──\n';
+      result += 'ISO 8601:    ' + date.toISOString() + '\n';
+      result += 'UTC String:  ' + date.toUTCString() + '\n\n';
+      result += '── Local ──\n';
+      result += 'Local:       ' + date.toString() + '\n';
+      result += 'Locale:      ' + date.toLocaleString() + '\n\n';
+      result += '── Values ──\n';
+      result += 'Seconds:     ' + Math.floor(ms / 1000) + '\n';
+      result += 'Milliseconds:' + ms + '\n';
+
+      output.textContent = result;
+      setBadge('valid', '✓ Converted');
+    }
+
+    function dateToTimestamp() {
+      const raw = input.value.trim();
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+
+      const date = new Date(raw);
+      if (isNaN(date.getTime())) {
+        output.innerHTML = '<span class="error-msg">❌ Could not parse date: "' + escapeHtml(raw) + '"</span>';
+        setBadge('invalid', '✗ Error');
+        return;
+      }
+
+      const ms = date.getTime();
+      const sec = Math.floor(ms / 1000);
+
+      let result = '';
+      result += 'Parsed Date: ' + date.toString() + '\n';
+      result += 'ISO 8601:    ' + date.toISOString() + '\n\n';
+      result += '── Timestamps ──\n';
+      result += 'Seconds:      ' + sec + '\n';
+      result += 'Milliseconds: ' + ms + '\n';
+
+      output.textContent = result;
+      setBadge('valid', '✓ Converted');
+    }
+
+    function showNow() {
+      const now = new Date();
+      const sec = Math.floor(now.getTime() / 1000);
+      input.value = sec.toString();
+      timestampToDate();
+    }
+
+    function copyOutput() {
+      const text = output.textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      });
+    }
+
+    function clearAll() {
+      input.value = '';
+      output.textContent = '';
+      setBadge('empty', 'Empty');
+    }
+
+    function setBadge(cls, text) {
+      badge.className = 'status ' + cls;
+      badge.textContent = text;
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  </script>
+</body>
+</html>

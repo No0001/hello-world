@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base64 Encode & Decode Online - Free Base64 Converter</title>
+  <meta name="description" content="Free online Base64 encoder and decoder. Convert text to Base64 and Base64 back to text instantly in your browser. No data sent to servers.">
+  <meta name="keywords" content="base64 encode, base64 decode, base64 converter, online base64 tool, text to base64">
+  <link rel="canonical" href="https://no0001.github.io/hello-world/base64/">
+  <link rel="stylesheet" href="/hello-world/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/hello-world/" class="logo">🛠 DevToolBox</a>
+    <div class="nav-links">
+      <a href="/hello-world/json-formatter/">JSON Formatter</a>
+      <a href="/hello-world/base64/" style="color:var(--text)">Base64</a>
+      <a href="/hello-world/url-encoder/">URL Encoder</a>
+      <a href="/hello-world/timestamp/">Timestamp</a>
+      <a href="/hello-world/hash-generator/">Hash Generator</a>
+    </div>
+  </nav>
+
+  <main class="tool-page">
+    <div class="tool-header">
+      <h1>Base64 Encode / Decode</h1>
+      <p>Encode text to Base64 or decode Base64 back to text — instantly in your browser.</p>
+    </div>
+
+    <!-- Ad Slot: Top Banner -->
+    <div class="ad-slot" id="ad-top">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="encodeBase64()">🔒 Encode</button>
+      <button onclick="decodeBase64()">🔓 Decode</button>
+      <button onclick="copyOutput()">📋 Copy</button>
+      <button onclick="clearAll()">🗑 Clear</button>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Input</span>
+          <span class="status empty" id="statusBadge">Empty</span>
+        </div>
+        <textarea
+          class="editor"
+          id="textInput"
+          placeholder="Enter text to encode, or paste Base64 to decode..."
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <div class="editor-panel">
+        <div class="panel-label">
+          <span>Output</span>
+        </div>
+        <pre class="output" id="textOutput"></pre>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <span id="statChars">Input: 0 chars</span>
+      <span id="statOutputChars">Output: 0 chars</span>
+      <span id="statSize">Size: 0 B</span>
+    </div>
+
+    <!-- Ad Slot: Below Tool -->
+    <div class="ad-slot" id="ad-bottom">
+      <!-- Google AdSense unit goes here -->
+      Ad Space (728x90)
+    </div>
+
+    <!-- SEO Content -->
+    <section class="seo-content">
+      <h2>What is Base64?</h2>
+      <p>Base64 is a binary-to-text encoding scheme that represents binary data using a set of 64 printable ASCII characters (A–Z, a–z, 0–9, +, /). It is commonly used to embed binary data — such as images, files, or cryptographic keys — into text-based formats like JSON, XML, HTML, or email (MIME).</p>
+
+      <h2>How does Base64 work?</h2>
+      <p>Base64 encoding works by taking every 3 bytes (24 bits) of input and splitting them into 4 groups of 6 bits. Each 6-bit group maps to one of the 64 characters in the Base64 alphabet. If the input length is not a multiple of 3, padding characters (<code>=</code>) are appended to the output.</p>
+
+      <h2>Common use cases</h2>
+      <ul>
+        <li><strong>Data URIs</strong> — Embedding images directly in HTML/CSS using <code>data:image/png;base64,...</code></li>
+        <li><strong>Email attachments</strong> — MIME encoding for binary attachments in email.</li>
+        <li><strong>Web APIs</strong> — Transmitting binary data in JSON payloads.</li>
+        <li><strong>Authentication</strong> — HTTP Basic Auth headers use Base64-encoded credentials.</li>
+      </ul>
+
+      <h2>Is my data safe?</h2>
+      <p>Yes. This tool runs entirely in your browser using JavaScript's built-in <code>btoa()</code> and <code>atob()</code> functions. No data is ever sent to any server.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 DevToolBox. All tools run locally in your browser. <a href="/hello-world/privacy/" style="color:var(--text-muted)">Privacy Policy</a></p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('textInput');
+    const output = document.getElementById('textOutput');
+    const badge = document.getElementById('statusBadge');
+
+    input.addEventListener('input', updateStats);
+
+    function encodeBase64() {
+      const raw = input.value;
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+      try {
+        const encoded = btoa(unescape(encodeURIComponent(raw)));
+        output.textContent = encoded;
+        setBadge('valid', '✓ Encoded');
+      } catch (e) {
+        output.innerHTML = '<span class="error-msg">❌ ' + escapeHtml(e.message) + '</span>';
+        setBadge('invalid', '✗ Error');
+      }
+      updateStats();
+    }
+
+    function decodeBase64() {
+      const raw = input.value.trim();
+      if (!raw) { output.textContent = ''; setBadge('empty', 'Empty'); return; }
+      try {
+        const decoded = decodeURIComponent(escape(atob(raw)));
+        output.textContent = decoded;
+        setBadge('valid', '✓ Decoded');
+      } catch (e) {
+        output.innerHTML = '<span class="error-msg">❌ Invalid Base64: ' + escapeHtml(e.message) + '</span>';
+        setBadge('invalid', '✗ Error');
+      }
+      updateStats();
+    }
+
+    function copyOutput() {
+      const text = output.textContent;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+      });
+    }
+
+    function clearAll() {
+      input.value = '';
+      output.textContent = '';
+      setBadge('empty', 'Empty');
+      updateStats();
+    }
+
+    function setBadge(cls, text) {
+      badge.className = 'status ' + cls;
+      badge.textContent = text;
+    }
+
+    function updateStats() {
+      const raw = input.value;
+      const out = output.textContent || '';
+      document.getElementById('statChars').textContent = 'Input: ' + raw.length + ' chars';
+      document.getElementById('statOutputChars').textContent = 'Output: ' + out.length + ' chars';
+      const bytes = new Blob([raw]).size;
+      document.getElementById('statSize').textContent = 'Size: ' + formatBytes(bytes);
+    }
+
+    function formatBytes(b) {
+      if (b === 0) return '0 B';
+      const units = ['B', 'KB', 'MB'];
+      const i = Math.floor(Math.log(b) / Math.log(1024));
+      return (b / Math.pow(1024, i)).toFixed(i ? 1 : 0) + ' ' + units[i];
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  </script>
+</body>
+</html>
